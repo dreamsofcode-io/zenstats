@@ -27,10 +27,10 @@ sudo apt update
 # On your local machine, generate an SSH key pair if you don’t already have one
 ssh-keygen -t ed25519 -C "your_email@example.com"
 
-# Copy the SSH key to the new user on the server
+# Copy the SSH key from your local machine to the new user on the server
 ssh-copy-id -i ~/.ssh/id_ed25519.pub newuser@your-server-ip
 
-# Test key-based login
+# Test key-based login from your loacl machine
 ssh newuser@your-server-ip
 ```
 
@@ -41,8 +41,9 @@ ssh newuser@your-server-ip
 sudo nano /etc/ssh/sshd_config
 
 # Modify the following in the file:
-# PermitRootLogin no # Disable root login
-# PasswordAuthentication no  # Disable password based auth
+PermitRootLogin no # Disable root login
+PasswordAuthentication no  # Disable password based auth
+UsePAM no # Disable PAM authentication
 
 # Restart SSH service
 sudo systemctl restart ssh
@@ -56,10 +57,19 @@ ssh newuser@your-server-ip
 # Install UFW if not already installed
 sudo apt install ufw
 
+# (optional) Deny All incomming by default
+sudo ufw default deny incoming
+
+# (optional) Allow All outgoing by default
+sudo ufw default allow outgoing 
+
 # Allow necessary ports
 sudo ufw allow OpenSSH    # SSH
 sudo ufw allow 80/tcp     # HTTP
 sudo ufw allow 443/tcp    # HTTPS
+
+# Check the rules added to the ufw
+sudo ufw show added
 
 # Enable UFW
 sudo ufw enable
